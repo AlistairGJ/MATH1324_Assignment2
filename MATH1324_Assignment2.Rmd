@@ -1,0 +1,173 @@
+---
+title: "MATH1324 Assignment 2"
+subtitle: Modeling Body Measurements
+output:
+  html_notebook: default
+---
+
+## Student Details
+Student Name: Alistair Grevis-James
+Student Number: s3644119
+s3644119@student.rmit.edu.au
+
+## Executive Summary
+
+The packages ggplot2 & dplyr were imported into the R-Studio Interactive Environment (Version 1.0.143 – © 2009-2016 RStudio, Inc.). The file "bdims.csv" was imported into R-Studio as "bdims". The importation was checked showing a size of 507 observations by 25 variables. No missing data was found. Summary statistics for all, male and female were determined. Visualization was performed with histograms, which were overlayed with normal curves.
+
+## Problem Statement
+
+After importation of the data set "bdims.csv", summary statistics will be determined for the variable 'bic.gi'. This variable is described as "respondent's bicep girth in centimeters, measured when flexed as the average of right and left girths". Of the 507 observations, 247 originate from males (denoted '1') & 260 from females (denoted '0'). Summary statistics will enable us to determine if there is a quantifiable difference for measurements of 'bic.gi' from the sample set. Data visualization (using histograms) will allow us to better interpret such difference. Normal curve overlay will allow us to determine if the empirical data has a normal distribution.
+
+## Load Packages & Data Importation
+```{r}
+library(ggplot2)
+library(dplyr)
+setwd("/Users/alistairgj/R Scripts")
+getwd()
+bdims <- read.csv("bdims.csv")
+```
+
+## Data Checking
+The internal structure of the data was first checked with str(). This showed the data was in the form 'data.frame' with 507 observations of 25 variables. Data types consist of num and int. The categories male (m) and female (f) has been given the int values 1 and 0, respectively.
+```{r}
+str(bdims)
+```
+Confirming rows 1 till 247 are males (1), while rows 248 till 507 are female (0).
+```{r}
+bdims$sex[c(1,247,248,507)]
+table(bdims$sex[1:247])
+table(bdims$sex[248:507])
+```
+## Summary Statistics
+
+##### Mean (All, Male, Female)
+```{r}
+mean(bdims$bic.gi)
+mean(bdims$bic.gi[1:247])
+mean(bdims$bic.gi[248:507])
+```
+##### Range (All, Male, Female) - Gives min and max
+```{r}
+range(bdims$bic.gi)
+range(bdims$bic.gi[1:247])
+range(bdims$bic.gi[248:507])
+```
+##### Varience (All, Male, Female)
+```{r}
+var(bdims$bic.gi)
+var(bdims$bic.gi[1:247])
+var(bdims$bic.gi[248:507])
+```
+##### Standard Deviation (All, Male, Female)
+```{r}
+sd(bdims$bic.gi)
+sd(bdims$bic.gi[1:247])
+sd(bdims$bic.gi[248:507])
+```
+##### Quartile (All, Male, Female)
+```{r}
+quantile(bdims$bic.gi)
+quantile(bdims$bic.gi[1:247])
+quantile(bdims$bic.gi[248:507])
+```
+##### IQR (All, Male, Female)
+```{r}
+IQR(bdims$bic.gi)
+IQR(bdims$bic.gi[1:247])
+IQR(bdims$bic.gi[248:507])
+```
+##### Median (All, Male, Female)
+```{r}
+median(bdims$bic.gi)
+median(bdims$bic.gi[1:247])
+median(bdims$bic.gi[248:507])
+```
+##### Grouping
+```{r}
+bdims %>% group_by(sex) %>% summarise(Min = min(bdims$bic.gi,na.rm = TRUE),
+                                         Q1 = quantile(bdims$bic.gi,probs = .25,na.rm = TRUE),
+                                         Median = median(bdims$bic.gi, na.rm = TRUE),
+                                         Q3 = quantile(bdims$bic.gi,probs = .75,na.rm = TRUE),
+                                         Max = max(bdims$bic.gi,na.rm = TRUE),
+                                         Mean = mean(bdims$bic.gi, na.rm = TRUE),
+                                         SD = sd(bdims$bic.gi, na.rm = TRUE),
+                                         n = n(),
+                                         Missing = sum(is.na(bdims$bic.gi)))
+```
+## Distribution Fitting
+##### Histogram (All) without considering bins
+```{r}
+m_all <- mean(bdims$bic.gi)
+sd_all <- sd(bdims$bic.gi)
+hist(bdims$bic.gi, xlim = c(15, 50), ylim = c(0, 0.1), col="grey", xlab="Bicep Girth (male and female)",
+                         main="Histogram of all Resondent's Bicep Girth", freq = FALSE)
+    curve(expr = dnorm(x, mean=m_all, sd = sd_all), col="darkblue", lwd=2, add=TRUE)
+```
+##### Bins (All)
+```{r}
+sqrt(507)
+```
+
+##### Histogram (All) with 23 bins
+```{r}
+m_all <- mean(bdims$bic.gi)
+sd_all <- sd(bdims$bic.gi)
+hist(bdims$bic.gi, xlim = c(15, 50), ylim = c(0, 0.1), col="grey", xlab="Bicep Girth (male and female)",
+                         main="Histogram of all Resondent's Bicep Girth", breaks = 23, freq = FALSE)
+    curve(expr = dnorm(x, mean=m_all, sd = sd_all), col="darkblue", lwd=2, add=TRUE)
+```
+
+
+##### Histogram (Male) without considering bins
+```{r}
+m_male <- mean(bdims$bic.gi[1:247])
+sd_male <- sd(bdims$bic.gi[1:247])
+hist(bdims$bic.gi[1:247], xlim = c(20, 50), ylim = c(0, 0.15), col="grey", xlab="Bicep Girth (Male)",
+                         main="Histogram of Male Respondent's Bicep Girth", freq = FALSE)
+    curve(expr = dnorm(x, mean=m_male, sd = sd_male), col="darkblue", lwd=2, add=TRUE)
+```
+##### Bins (Male)
+```{r}
+sqrt(247)
+```
+##### Histogram (Male) with 16 bins
+```{r}
+m_male <- mean(bdims$bic.gi[1:247])
+sd_male <- sd(bdims$bic.gi[1:247])
+hist(bdims$bic.gi[1:247], xlim = c(20, 50), ylim = c(0, 0.15), col="grey", xlab="Bicep Girth (Male)",
+                         main="Histogram of Male Respondent's Bicep Girth", breaks = 16, freq = FALSE)
+    curve(expr = dnorm(x, mean=m_male, sd = sd_male), col="darkblue", lwd=2, add=TRUE)
+```
+
+##### Histogram (Female) without considering bins
+```{r}
+m_female <- mean(bdims$bic.gi[248:507])
+sd_female <- sd(bdims$bic.gi[248:507])
+hist(bdims$bic.gi[248:507], xlim = c(15, 45), ylim = c(0, 0.18), col="grey", xlab="Bicep Girth (Female)",
+                         main="Histogram of Female Respondent's Bicep Girth", freq = FALSE)
+    curve(expr = dnorm(x, mean=m_female, sd = sd_female), col="darkblue", lwd=2, add=TRUE)
+```
+##### Bins (Female)
+```{r}
+sqrt(260)
+```
+##### Histogram (Female) with 16 bins
+```{r}
+m_female <- mean(bdims$bic.gi[248:507])
+sd_female <- sd(bdims$bic.gi[248:507])
+hist(bdims$bic.gi[248:507], xlim = c(15, 45), ylim = c(0, 0.18), col="grey", xlab="Bicep Girth (Female)",
+                         main="Histogram of Female Respondent's Bicep Girth", breaks = 16, freq = FALSE)
+    curve(expr = dnorm(x, mean=m_female, sd = sd_female), col="darkblue", lwd=2, add=TRUE)
+```
+
+## Interpretation
+
+Throughout this investigation we have developed our statistical data processing skills through analysis of the variable 'bic.gi' (respondent's bicep girth in centimeters, measured when flexed as the average of right and left girths). Statistics summary enabled us to quantify and record the different statistical properties (mean, sd, median, e.t.c.,) between male, female and all participants.
+
+Upon visualizing the results, we initially saw a histogram with a symmetrical spread (all resondents). This histogram can be seen to poorly fit the overlaid normalized curve. When the data was split into sex, we saw that the histogram (empirical) for males bic.gi gave a symmetric (if not slightly skewed right) unimodal plot. The overlaid normalized curve confirmed this interpretation. The histogram for females bic.gi gave a slightly left skewed unimodal plot. The overlaid normalized curve for females was still well fit to the histogram (empirical). When bins were adjusted the comparison between empirical and normalized was better in all cases.
+
+The processing and resultant visualization shows that for the variable bic.gi, splitting the respondent's into male and female gives a more meaningfull statistical result.
+
+Direction for future study includes more statistical evaluation / visualization (e.g., box plots), and comparative analysis using additional variables (age, height, and so on). Strong correlations between various body dimensions may also exist, and determining these may eliminate the need certain measurements.
+
+
